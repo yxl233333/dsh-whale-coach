@@ -1,7 +1,7 @@
 {
   "name": "dsh-whale-coach",
-  "version": "0.5.0",
-  "description": "旁听子代笔：读上下文、判断何时适合开口（递话给她发语音）、滚动记录聊天以便转生",
+  "version": "0.6.0",
+  "description": "旁听小助手：判断时机递话（语音/表情）、滚动记录聊天、上下文快满时提醒换会话",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
