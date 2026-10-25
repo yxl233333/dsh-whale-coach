@@ -75,6 +75,12 @@ dsh plugin --profile <你的 profile> add github:<你的账号>/dsh-whale-coach
 
 调试接口：`GET /whale-coach/state`（返回配置、轮次、字数、最近闸状态）。
 
+## 兼容性与踩过的坑
+
+- 本插件监听的是 `ctx.on('session/event', ...)`。**不要**换成 `agent/turn-stopping`——在某些 DSH 版本里这个事件不触发，插件会静默空转（`rounds` 一直是 0）。
+- 改完插件代码必须**重启 DSH** 才生效（插件模块在进程内缓存，热重载只认配置）。
+- 判断时机依赖 `ctx.llm.listProviders()` 能列出可用 provider；拿不到时会退到会话自己的模型。
+
 ## 已知限制
 
 - **拿不到精确的上下文占用**：DSH 没把 token 用量暴露给插件，所以「快满了」是按本会话累计字数估算的（约 1 字 ≈ 0.6 token）。想手动「转生」的话，直接跟角色说一声更准。
