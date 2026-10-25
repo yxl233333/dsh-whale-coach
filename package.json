@@ -1,0 +1,40 @@
+{
+  "name": "dsh-whale-coach",
+  "version": "0.1.0",
+  "description": "旁听子代笔：读上下文、判断何时适合开口（递话给她发语音）、滚动记录聊天以便转生",
+  "type": "module",
+  "main": "lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./cordis.patch.yml": "./cordis.patch.yml",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib/index.js",
+    "cordis.patch.yml",
+    "README.md",
+    "LICENSE"
+  ],
+  "license": "MIT",
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  },
+  "author": "pairun325",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pairun325/dsh-whale-coach.git"
+  },
+  "homepage": "https://github.com/pairun325/dsh-whale-coach",
+  "keywords": [
+    "dsh",
+    "dsh-plugin",
+    "deepseek-harness",
+    "companion",
+    "context",
+    "voice",
+    "sticker",
+    "digest"
+  ]
+}
