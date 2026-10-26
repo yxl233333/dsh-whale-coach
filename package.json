@@ -1,7 +1,7 @@
 {
   "name": "dsh-whale-coach",
-  "version": "0.7.0",
-  "description": "旁听小助手：判断时机递话（语音/表情）、滚动记录聊天、上下文快满时提醒换会话",
+  "version": "0.8.0",
+  "description": "旁听小助手：判断时机递话（语音/表情/自发念头）、滚动记录聊天、跨会话互看、记忆补课、影子独白",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
