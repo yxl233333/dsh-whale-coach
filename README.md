@@ -1,4 +1,6 @@
-# dsh-whale-coach
+# 鲸鱼灵魂 · dsh-whale-coach（soul）
+
+> 名字从「旁听小助手」改成 **鲸鱼灵魂**：它不只是旁听，还负责她的记忆、独白、无聊值和行动冲动。
 
 给 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) 用的**旁听小助手**：它不替角色说话，只在旁边看着你们聊，时机合适时递一句话进去——「要不要开口？要不要配个表情？」——台词由角色自己写。
 
