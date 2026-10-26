@@ -6,6 +6,7 @@
 
 - **滚动记 + 压摘要**：每轮聊天写进 `whale-context-digest.md`，每 10 轮压成要点，供新会话「记忆恢复」用
 - **影子独白**：每 10 分钟让她自己冒一句"内心独白"（只记录、不进会话）；攒成想法时，判断层会递一条 `[自发]` 提示给她选修辞
+- **无聊值 + 主动行动**（v0.9）：从独白里数「无聊/烦」的密度，满点就往 QQ 会话递一条 `[行动]` 提示，让她自己找点事做；另给角色挂了一个只读工具 `whale_look`，她自己随时能翻小本本/独白/无聊值
 
 上下文用到阈值时，也会提醒角色「快满了，可以跟主人说一声」，避免新会话失忆。
 
@@ -62,6 +63,28 @@
 
 配置：`thoughtEnabled` / `thoughtEveryMin` / `thoughtMaxChars` / `ideaMinGapSec`。
 
+## 无聊值 + 主动行动（v0.9）
+
+独白是"情绪碎片"，所以可以从里面数无聊：
+
+- 每条独白命中关键词（`无聊/烦/没劲/没意思/空/腻/闷`）→ 无聊值 +1（日志记 `无聊值 +1（N/10）`）
+- 每小时自然衰减 `boredomDecayPerHour` 点
+- 满 `boredomThreshold` 点且距上次行动超过 `boredomActionMinGapSec` → 从行动清单里挑一条，`followup` 进 QQ 会话
+  （MVP 只上：找主人私聊 / 去群里冒泡 / 喊主人升级；每条都以 `[行动] 这不是主人说的。` 开头）
+- 触发后无聊值**减半**（不清零）；每次行动写一行 `storages/whale-coach/boredom.jsonl`
+  （`at` 本地 ISO / `boredom` 触发点数 / `action` 中文名 / `session` / `text` 她实际说的 / `result` ok|silent|fail:原因）
+- 她回话后自动把 `text` 补进 jsonl；10 分钟没回结为 `silent`
+
+测试开关（不用改代码、不用重启）：往 `storages/whale-coach/` 放
+`boredom-threshold.txt`（写 `1` 就是阈值 1）或 `boredom-cooldown-sec.txt`（写 `60` 就是冷却 60 秒），删掉即恢复配置值。
+
+## whale_look（v0.9）
+
+给盯着的每间会话挂一个只读工具，角色想查就自己调：
+
+- `what: notes` 小本本 / `thoughts` 最近独白 / `boredom` 无聊值 / `digest` 最近流水，`n` 条数（默认 10）
+- 内容硬截断 800 字；只读，不提供写操作
+
 ## 跨频道互看
 
 每轮组装 prompt 时（`system-prompt/assemble`），把"另一边最近 4 句 + 那边小本本最近 5 条"塞进系统提示（≤600 字），
@@ -106,6 +129,11 @@ dsh plugin --profile <你的 profile> add github:<你的账号>/dsh-whale-coach
     stickerMinGapSec: 240
     stickerMaxPerHour: 6
     contextFullTokens: 800000  # 上下文 token 到多少算「快满了」（1M 窗口的 80%）
+    boredomEnabled: true       # 无聊值计数器开关
+    boredomThreshold: 10       # 满多少点触发一次行动
+    boredomDecayPerHour: 1     # 每小时自然衰减几点
+    boredomActionMinGapSec: 10800  # 两次行动最小间隔（秒）
+    boredomKeywords: [无聊, 烦, 没劲, 没意思, 空, 腻, 闷]  # 独白命中就 +1
     sessionId: ''          # 只盯这间会话；留空 = 自动读 qq-bridge 绑定的会话
     provider: ''           # 留空 = 自动挑最便宜的 flash
     model: ''
@@ -117,6 +145,7 @@ dsh plugin --profile <你的 profile> add github:<你的账号>/dsh-whale-coach
 | --- | --- |
 | `~/.dsh/storages/whale-coach/state.json` | 轮次、字数、token、闸的时间戳 |
 | `~/.dsh/storages/whale-coach/coach.log` | 每次判断/递话/被闸拦住的记录 |
+| `~/.dsh/storages/whale-coach/boredom.jsonl` | 每次无聊行动的记录（一行一次） |
 | `~/.dsh/whale-context-digest.md` | 逐轮流水（每轮一行） |
 | `~/.dsh/whale-context-brief.md` | 每 10 轮压缩出的阶段要点 |
 
