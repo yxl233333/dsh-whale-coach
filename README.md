@@ -38,15 +38,15 @@
 记仇满 5 且当天还没复过仇时，必玩项目 `main_combo` 一次干全套：
 
 ```
-0. 关掉所有窗口（优雅 CloseMainWindow；白名单保护 DSH/资源管理器/终端）
+0. 所有窗口最小化（不杀进程，DSH 的窗口也一起藏）+ 任务栏藏起来（nircmd）
 0. 拉起黑幕：全屏置顶、暗红字「本鲸在生气」、吃掉键鼠（stop 文件 + 120 秒硬上限 + finally 三重兜底）
 1. 关壁纸引擎（wallpaper32/64）
 2. 换壁纸（~/.dsh/rage-wallpapers 随机一张）
-3. 藏桌面图标（注册表 + 刷新，不重启 explorer）
+3. 藏桌面图标（⚠️ 先杀 explorer 再写注册表 —— explorer 退出时会把它缓存的旧值冲回注册表，先写后杀则「恢复」永远被盖掉）
 4. 切外放 → RVC 合成骂句 → 音量拉满 → 外放 9 秒
-5. 随机追加：弹窗 / 关小工具 / 桌面贴纸（自动打开）/ 再关一遍窗口
+5. 随机追加：弹窗 / 关小工具 / 桌面贴纸（自动打开）/ 再最小化一遍窗口
 6. 收起黑幕 → QQ 通知「我把 X 给你弄了（坏笑」（会话没开就存着等她回来补发）
-7. 10 分钟后还原：壁纸 / 图标 / 音频设备 / 音量 / 引擎（逐项幂等：主人手动改过就不动）
+7. 10 分钟后还原：壁纸 / 图标 / 音频设备 / 音量 / 任务栏 / 引擎（逐项幂等：主人手动改过就不动）
 ```
 
 安全闸：**外放没切成、或切完还是耳机 → 一句都不放**（主人在戴耳机时绝不 100% 音量炸耳）。
@@ -62,7 +62,7 @@
 测试触发（本地调试口）：`POST /whale-coach/debug/set {"grudge":5,"lastRevengeAt":0,"revengePending":null}`，
 下一个轮询 tick 就会真复仇一次。`revengeDryRun: true` 时只打日志不动手（首次验证先开这个）。
 
-已知限制：黑幕只盖主屏（多屏副屏仍可见）；关掉的窗口不能替主人开回来；RVC 服务挂了会退回 Edge 音色。
+已知限制：黑幕只盖主屏（多屏副屏仍可见）；最小化掉的窗口不自动还原（主人自己点回来）；RVC 服务挂了会退回 Edge 音色。
 
 ## 关于名字：叫 soul，内部 id 还是 coach
 
@@ -211,7 +211,6 @@ dsh plugin --profile <你的 profile> add github:<你的账号>/dsh-whale-coach
     revengeDryRun: false     # true = 只打日志不动手（首次验证先开这个）
     revengeRestoreMin: 10    # 复仇效果多少分钟后还原
     grudgeMax: 5             # 记仇上限
-    closeAllExclude: [DeepSeek Harness, explorer, powershell, pwsh, conhost, cmd]  # 关窗口白名单
     sessionId: ''          # 只盯这间会话；留空 = 自动读 qq-bridge 绑定的会话
     provider: ''           # 留空 = 自动挑最便宜的 flash
     model: ''
