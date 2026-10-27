@@ -1,7 +1,7 @@
 {
   "name": "dsh-whale-coach",
-  "version": "0.10.0",
-  "description": "鲸鱼灵魂（soul）：陪在旁边判断时机递话（语音/表情/自发念头）、滚动记录、跨会话互看、记忆补课、影子独白与无聊值",
+  "version": "0.11.0",
+  "description": "鲸鱼灵魂（soul）：时机判断（语音/表情/自发）、记忆与跨会话、影子独白、无聊值与行动、情绪循环（开心→愤怒→伤心→释怀）、记仇与复仇",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
