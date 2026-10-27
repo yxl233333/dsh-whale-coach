@@ -33,6 +33,37 @@
 安全设计：复仇命令全部写死在代码里（不接受模型生成的命令）、只用 HKCU 与三个小工具进程、
 `revengeDryRun` 默认开着（只打日志不动手）、深夜 2~7 点不执行。
 
+## 复仇 · main_combo 全流程（v0.12）
+
+记仇满 5 且当天还没复过仇时，必玩项目 `main_combo` 一次干全套：
+
+```
+0. 关掉所有窗口（优雅 CloseMainWindow；白名单保护 DSH/资源管理器/终端）
+0. 拉起黑幕：全屏置顶、暗红字「本鲸在生气」、吃掉键鼠（stop 文件 + 120 秒硬上限 + finally 三重兜底）
+1. 关壁纸引擎（wallpaper32/64）
+2. 换壁纸（~/.dsh/rage-wallpapers 随机一张）
+3. 藏桌面图标（注册表 + 刷新，不重启 explorer）
+4. 切外放 → RVC 合成骂句 → 音量拉满 → 外放 9 秒
+5. 随机追加：弹窗 / 关小工具 / 桌面贴纸（自动打开）/ 再关一遍窗口
+6. 收起黑幕 → QQ 通知「我把 X 给你弄了（坏笑」（会话没开就存着等她回来补发）
+7. 10 分钟后还原：壁纸 / 图标 / 音频设备 / 音量 / 引擎（逐项幂等：主人手动改过就不动）
+```
+
+安全闸：**外放没切成、或切完还是耳机 → 一句都不放**（主人在戴耳机时绝不 100% 音量炸耳）。
+
+这台机器上踩过、已修的两个坑（记进 commit）：
+
+- `windowsHide:true` 起 PowerShell 时中文输出按 ANSI 码页 → `跑PS` 统一强制 UTF-8 输出，否则「扬声器/耳机」名字匹配和安全闸全瞎
+- **Win11 26H2（build 26300）**：IPolicyConfig 的 `SetDefaultEndpoint` 假成功（hr=0 但不生效）→ 切设备改走 nircmd 按名字切，切完读回实际设备核对（账面跟现实一致，10 分钟还原的幂等判断才成立）
+
+关键文件：`rage-wallpapers/`（放图即生效）、`revenge.jsonl`（结构化 before：引擎路径/原壁纸/图标/音频设备）、
+`last-revenge-backup.json`（最近一次原状备份）、`blackcover.log`（黑幕起停）、`rage-voice/*.mp3`（骂句音频）。
+
+测试触发（本地调试口）：`POST /whale-coach/debug/set {"grudge":5,"lastRevengeAt":0,"revengePending":null}`，
+下一个轮询 tick 就会真复仇一次。`revengeDryRun: true` 时只打日志不动手（首次验证先开这个）。
+
+已知限制：黑幕只盖主屏（多屏副屏仍可见）；关掉的窗口不能替主人开回来；RVC 服务挂了会退回 Edge 音色。
+
 ## 关于名字：叫 soul，内部 id 还是 coach
 
 这个项目的正式名字是 **鲸鱼灵魂（soul）**，但**内部 id 保持 `dsh-whale-coach` 不变**。
@@ -176,6 +207,11 @@ dsh plugin --profile <你的 profile> add github:<你的账号>/dsh-whale-coach
     boredomDecayPerHour: 1     # 每小时自然衰减几点
     boredomActionMinGapSec: 10800  # 两次行动最小间隔（秒）
     boredomKeywords: [无聊, 烦, 没劲, 没意思, 空, 腻, 闷]  # 独白命中就 +1
+    revengeEnabled: true     # 复仇总开关
+    revengeDryRun: false     # true = 只打日志不动手（首次验证先开这个）
+    revengeRestoreMin: 10    # 复仇效果多少分钟后还原
+    grudgeMax: 5             # 记仇上限
+    closeAllExclude: [DeepSeek Harness, explorer, powershell, pwsh, conhost, cmd]  # 关窗口白名单
     sessionId: ''          # 只盯这间会话；留空 = 自动读 qq-bridge 绑定的会话
     provider: ''           # 留空 = 自动挑最便宜的 flash
     model: ''
